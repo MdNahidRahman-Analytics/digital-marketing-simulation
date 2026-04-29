@@ -65,6 +65,25 @@ The core business problem: **How do you scale a multi-channel paid ad strategy f
 | **Budget Spent** | $17,399.74 | $600 | $8,099.08 | $26,098.82 |
 | **Revenue Generated** | $109,200 | $780 | $20,000 | $129,980 |
 | **ROAS** | ~6.28x | 1.30x | ~2.47x | ~4.98x |
+## 📊 Visual Charts
+
+### Total Revenue vs Budget Spent
+![Total Revenue vs Budget Spent](Total%20Revenue%20Vs%20Budget%20Spent.png)
+
+### ROAS by Round
+![ROAS by Round](Roas%20by%20Round.png)
+
+### Channel Revenue Breakdown
+![Channel Revenue](Channel%20Revenue.png)
+
+### Revenue by Channel (Round 10)
+![Revenue by Channel](Revenue%20by%20Channel.png)
+
+### Budget Allocation (Round 10)
+![Budget Allocation](Budget%20Allocation.png)
+
+## 🖥️ Live Interactive Dashboard
+👉 [Click here to view the full interactive dashboard](./buhi_dashboard.html)
 
 ### Round 10 Search Campaign Details
 - **Impressions:** 32,677
