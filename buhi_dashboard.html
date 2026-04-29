@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buhi Digital Marketing Simulation — Campaign Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f4f6fb;
+    color: #1a1a2e;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a3a5c 0%, #2e6da4 100%);
+    color: white;
+    padding: 40px 48px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .header-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 28px;
+  }
+  .header-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+  }
+
+  /* DOWNLOAD BAR */
+  .download-bar {
+    background: #fff;
+    border-bottom: 1px solid #e8eaf0;
+    padding: 10px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .download-bar span {
+    font-size: 13px;
+    color: #666;
+  }
+  .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: #2e6da4; color: white; }
+  .btn-primary:hover { background: #1a3a5c; }
+  .btn-outline { background: transparent; color: #2e6da4; border: 1.5px solid #2e6da4; }
+  .btn-outline:hover { background: #f0f5ff; }
+
+  /* MAIN CONTENT */
+  .main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 0; }
+
+  /* METRIC CARDS */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .metric-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 22px;
+    border: 1px solid #e8eaf0;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 14px 14px 0 0;
+  }
+  .metric-card:nth-child(1) { --accent: #2e6da4; }
+  .metric-card:nth-child(2) { --accent: #1d9e75; }
+  .metric-card:nth-child(3) { --accent: #d85a30; }
+  .metric-card:nth-child(4) { --accent: #7c3abd; }
+  .metric-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .metric-note {
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  /* CHART CARDS */
+  .chart-row {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-row.two-col { grid-template-columns: 1fr 1fr; }
+  .chart-row.three-col { grid-template-columns: 2fr 1fr; }
+
+  .chart-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e8eaf0;
+    padding: 24px 24px 20px;
+  }
+  .chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 3px;
+  }
+  .chart-desc {
+    font-size: 12px;
+    color: #999;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #555;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ROUND TABLE */
+  .round-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .round-table th {
+    background: #1a3a5c;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .round-table th:first-child { border-radius: 6px 0 0 0; }
+  .round-table th:last-child { border-radius: 0 6px 0 0; }
+  .round-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f2f7;
+    color: #333;
+  }
+  .round-table tr:nth-child(even) td { background: #f8f9fd; }
+  .round-table tr:last-child td { border-bottom: none; }
+  .round-table tr:hover td { background: #edf3fb; }
+  .round-num {
+    font-weight: 700;
+    color: #2e6da4;
+  }
+  .revenue-cell { font-weight: 600; color: #1a3a5c; }
+  .channel-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .pill-search { background: #e8f0fb; color: #2e6da4; }
+  .pill-all { background: #e6f7f2; color: #0f6e56; }
+  .pill-sd { background: #fff0eb; color: #993c1d; }
+
+  /* INSIGHT CARDS */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .insight-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e8eaf0;
+    padding: 20px;
+  }
+  .insight-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #2e6da4;
+    margin-bottom: 8px;
+  }
+  .insight-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .insight-body {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 32px 24px 0;
+    font-size: 12px;
+    color: #aaa;
+  }
+  .footer strong { color: #666; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header { padding: 28px 20px; }
+    .header h1 { font-size: 22px; }
+    .download-bar { padding: 10px 20px; }
+    .main { padding: 20px 16px 0; }
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row.two-col, .chart-row.three-col { grid-template-columns: 1fr; }
+    .insight-grid { grid-template-columns: 1fr; }
+  }
+
+  /* PRINT */
+  @media print {
+    .download-bar, .btn-group { display: none; }
+    body { background: white; }
+    .chart-card, .metric-card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <p class="header-tag">Stukent Mimic Pro &nbsp;·&nbsp; Digital Marketing Simulation</p>
+  <h1>Buhi Campaign Performance Dashboard</h1>
+  <p class="header-sub">10-Round Paid Advertising Strategy &amp; Optimization &nbsp;|&nbsp; March 2026</p>
+  <div class="header-badges">
+    <span class="badge">Search Ads</span>
+    <span class="badge">Display Ads</span>
+    <span class="badge">Shopping Ads</span>
+    <span class="badge">$36,000 Budget Managed</span>
+    <span class="badge">Certificate of Completion</span>
+  </div>
+</div>
+
+<!-- DOWNLOAD BAR -->
+<div class="download-bar">
+  <span>💡 Tip: Use Ctrl+P (or Cmd+P on Mac) to print or save as PDF</span>
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="window.print()">🖨 Save as PDF</button>
+    <button class="btn btn-outline" onclick="downloadCharts()">📥 Download Charts</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- KPI CARDS -->
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-label">Final Round Revenue</p>
+      <p class="metric-value">$129,980</p>
+      <p class="metric-note">Round 10 · All channels</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Search ROAS — R10</p>
+      <p class="metric-value">6.28x</p>
+      <p class="metric-note">$109,200 / $17,399.74</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Revenue Growth</p>
+      <p class="metric-value">+1,860%</p>
+      <p class="metric-note">Round 1 $6,630 → Round 10 $129,980</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Budget Managed (R10)</p>
+      <p class="metric-value">$36,000</p>
+      <p class="metric-note">Across Search, Display & Shopping</p>
+    </div>
+  </div>
+
+  <!-- REVENUE + ROAS -->
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="chart-title">Total Revenue vs. Budget Spent — All 10 Rounds</p>
+          <p class="chart-desc">Revenue scaled 19x from Round 1 to Round 10</p>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#2e6da4"></span>Revenue</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#d85a30"></span>Budget Spent</div>
+      </div>
+      <div style="position:relative;height:260px;">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-row two-col">
+    <!-- ROAS -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="chart-title">ROAS by Round</p>
+          <p class="chart-desc">Revenue ÷ Budget Spent per round</p>
+        </div>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="roasChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Channel Revenue Stacked -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="chart-title">Channel Revenue — R5 to R10</p>
+          <p class="chart-desc">Search, Display & Shopping breakdown</p>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#2e6da4"></span>Search</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#1d9e75"></span>Shopping</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#d85a30"></span>Display</div>
+      </div>
+      <div style="position:relative;height:186px;">
+        <canvas id="channelChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE CHARTS -->
+  <div class="chart-row two-col">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="chart-title">Round 10 — Budget Allocation</p>
+          <p class="chart-desc">How the $36,000 was distributed</p>
+        </div>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="budgetPie"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="chart-title">Round 10 — Revenue by Channel</p>
+          <p class="chart-desc">Search drove 84% of total revenue</p>
+        </div>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="revenuePie"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUND TABLE -->
+  <div class="chart-card" style="margin-bottom:20px;">
+    <div class="chart-card-header">
+      <div>
+        <p class="chart-title">Round-by-Round Summary</p>
+        <p class="chart-desc">All 10 rounds — real data from Stukent Mimic Pro</p>
+      </div>
+    </div>
+    <table class="round-table">
+      <thead>
+        <tr>
+          <th>Round</th>
+          <th>Focus</th>
+          <th>Budget</th>
+          <th>Spent</th>
+          <th>Revenue</th>
+          <th>ROAS</th>
+          <th>Channels</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="round-num">R1</span></td>
+          <td>Intro to Search Ads</td>
+          <td>$1,200</td>
+          <td>$1,199.73</td>
+          <td class="revenue-cell">$6,630</td>
+          <td>5.53x</td>
+          <td><span class="channel-pill pill-search">Search</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R2</span></td>
+          <td>Search Ad Practice</td>
+          <td>$1,200</td>
+          <td>$1,199.80</td>
+          <td class="revenue-cell">$6,695</td>
+          <td>5.58x</td>
+          <td><span class="channel-pill pill-search">Search</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R3</span></td>
+          <td>Search Ad Optimization</td>
+          <td>$1,200</td>
+          <td>$1,199.67</td>
+          <td class="revenue-cell">$5,720</td>
+          <td>4.77x</td>
+          <td><span class="channel-pill pill-search">Search</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R4</span></td>
+          <td>Intro to Display Ads</td>
+          <td>$1,200</td>
+          <td>$1,199.46</td>
+          <td class="revenue-cell">$7,020</td>
+          <td>5.85x</td>
+          <td><span class="channel-pill pill-search">Search</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R5</span></td>
+          <td>Display Ads & Remarketing</td>
+          <td>$10,200</td>
+          <td>$10,199.52</td>
+          <td class="revenue-cell">$18,720</td>
+          <td>1.83x</td>
+          <td><span class="channel-pill pill-sd">Search + Display</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R6</span></td>
+          <td>Optimize Display Campaigns</td>
+          <td>$10,500</td>
+          <td>$10,499.51</td>
+          <td class="revenue-cell">$42,510</td>
+          <td>4.05x</td>
+          <td><span class="channel-pill pill-sd">Search + Display</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R7</span></td>
+          <td>Intro to Shopping Ads</td>
+          <td>$14,850</td>
+          <td>$14,848.36</td>
+          <td class="revenue-cell">$47,365</td>
+          <td>3.19x</td>
+          <td><span class="channel-pill pill-all">All Three</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R8</span></td>
+          <td>Shopping Ads Practice</td>
+          <td>$14,850</td>
+          <td>$14,849.56</td>
+          <td class="revenue-cell">$50,410</td>
+          <td>3.40x</td>
+          <td><span class="channel-pill pill-all">All Three</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R9</span></td>
+          <td>Shopping Ad Optimization</td>
+          <td>$24,000</td>
+          <td>$20,610.51</td>
+          <td class="revenue-cell">$83,415</td>
+          <td>4.05x</td>
+          <td><span class="channel-pill pill-all">All Three</span></td>
+        </tr>
+        <tr>
+          <td><span class="round-num">R10</span></td>
+          <td>Full Campaign Optimization</td>
+          <td>$36,000</td>
+          <td>$26,098.82</td>
+          <td class="revenue-cell">$129,980</td>
+          <td>4.98x</td>
+          <td><span class="channel-pill pill-all">All Three</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- KEY INSIGHTS -->
+  <div class="insight-grid">
+    <div class="insight-card">
+      <p class="insight-num">Insight 01</p>
+      <p class="insight-title">Search was the primary revenue engine throughout</p>
+      <p class="insight-body">Search Ads generated $109,200 of the $129,980 final round revenue — 84% of total. Strong keyword relevance and competitive bidding kept ROAS at 6.28x.</p>
+    </div>
+    <div class="insight-card">
+      <p class="insight-num">Insight 02</p>
+      <p class="insight-title">Display was pulled back as data showed lower returns</p>
+      <p class="insight-body">Display budget was cut from $9,000 (R5) to just $600 (R10) as ROAS data consistently showed it underperforming Search. Smart reallocation drove efficiency.</p>
+    </div>
+    <div class="insight-card">
+      <p class="insight-num">Insight 03</p>
+      <p class="insight-title">Shopping Ads added reliable product-level revenue</p>
+      <p class="insight-body">Launched in R7, Shopping Ads generated $20,000 on $8,099 spent in Round 10 — a 2.47x ROAS — providing strong support alongside the dominant Search channel.</p>
+    </div>
+    <div class="insight-card">
+      <p class="insight-num">Insight 04</p>
+      <p class="insight-title">Revenue targets were consistently exceeded</p>
+      <p class="insight-body">Round 10 target was $50,000. Actual revenue hit $129,980 — exceeding the target by 160% through aggressive optimization and smart budget allocation.</p>
+    </div>
+    <div class="insight-card">
+      <p class="insight-num">Insight 05</p>
+      <p class="insight-title">Revenue grew 1,860% from Round 1 to Round 10</p>
+      <p class="insight-body">Starting at $6,630 in Round 1 with just $1,200 in budget, the strategy scaled to $129,980 in Round 10 with a $36,000 budget — demonstrating compounding optimization gains.</p>
+    </div>
+    <div class="insight-card">
+      <p class="insight-num">Insight 06</p>
+      <p class="insight-title">Landing page relevance was a key quality driver</p>
+      <p class="insight-body">Ad Relevance and Page Relevance indicators guided keyword-to-landing-page alignment. Keeping these scores high reduced wasted spend and improved conversion rates.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p><strong>Buhi Digital Marketing Simulation</strong> &nbsp;·&nbsp; Stukent Mimic Pro &nbsp;·&nbsp; Completed March 2026</p>
+  <p style="margin-top:6px;">All data sourced directly from Stukent Mimic Pro simulation results. No numbers estimated or fabricated.</p>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Segoe UI', -apple-system, sans-serif";
+Chart.defaults.font.size = 12;
+
+const rounds = ['R1','R2','R3','R4','R5','R6','R7','R8','R9','R10'];
+const revenue = [6630,6695,5720,7020,18720,42510,47365,50410,83415,129980];
+const spent = [1200,1200,1200,1200,10200,10500,14850,14850,24000,36000];
+const roas = [5.53,5.58,4.77,5.85,1.83,4.05,3.19,3.40,4.05,4.98];
+
+// Revenue Chart
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: rounds,
+    datasets: [
+      { label: 'Revenue', data: revenue, backgroundColor: '#2e6da4', borderRadius: 5, order: 2 },
+      { label: 'Budget Spent', data: spent, backgroundColor: '#d85a30', borderRadius: 5, order: 1 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ' $' + ctx.parsed.y.toLocaleString() }
+    }},
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { callback: v => '$' + (v>=1000?(v/1000)+'k':v) } }
+    }
+  }
+});
+
+// ROAS Chart
+new Chart(document.getElementById('roasChart'), {
+  type: 'line',
+  data: {
+    labels: rounds,
+    datasets: [{
+      label: 'ROAS',
+      data: roas,
+      borderColor: '#1d9e75',
+      backgroundColor: 'rgba(29,158,117,0.08)',
+      pointBackgroundColor: '#1d9e75',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 6,
+      fill: true,
+      tension: 0.35
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ' ' + ctx.parsed.y.toFixed(2) + 'x' }
+    }},
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { callback: v => v + 'x' }, min: 0, max: 7 }
+    }
+  }
+});
+
+// Channel Stacked
+new Chart(document.getElementById('channelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['R5','R6','R7','R8','R9','R10'],
+    datasets: [
+      { label: 'Search', data: [6370,36205,30160,31200,60970,109200], backgroundColor: '#2e6da4' },
+      { label: 'Shopping', data: [0,0,10900,15115,20430,20000], backgroundColor: '#1d9e75' },
+      { label: 'Display', data: [12350,6305,6305,4095,2015,780], backgroundColor: '#d85a30' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString() }
+    }},
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { callback: v => '$'+(v>=1000?(v/1000)+'k':v) } }
+    }
+  }
+});
+
+// Budget Pie
+new Chart(document.getElementById('budgetPie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Search $17,400 (48%)', 'Shopping $18,000 (50%)', 'Display $600 (2%)'],
+    datasets: [{ data: [17400,18000,600], backgroundColor: ['#2e6da4','#1d9e75','#d85a30'], borderWidth: 3, borderColor: '#fff', hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } }, tooltip: {
+      callbacks: { label: ctx => ' $' + ctx.parsed.toLocaleString() }
+    }}
+  }
+});
+
+// Revenue Pie
+new Chart(document.getElementById('revenuePie'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Search $109,200 (84%)', 'Shopping $20,000 (15%)', 'Display $780 (1%)'],
+    datasets: [{ data: [109200,20000,780], backgroundColor: ['#2e6da4','#1d9e75','#d85a30'], borderWidth: 3, borderColor: '#fff', hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } }, tooltip: {
+      callbacks: { label: ctx => ' $' + ctx.parsed.toLocaleString() }
+    }}
+  }
+});
+
+// Download individual chart as PNG
+function downloadCharts() {
+  const charts = [
+    { id: 'revenueChart', name: 'revenue_by_round' },
+    { id: 'roasChart', name: 'roas_by_round' },
+    { id: 'channelChart', name: 'channel_breakdown' },
+    { id: 'budgetPie', name: 'budget_allocation' },
+    { id: 'revenuePie', name: 'revenue_by_channel' }
+  ];
+  charts.forEach((c, i) => {
+    setTimeout(() => {
+      const canvas = document.getElementById(c.id);
+      const link = document.createElement('a');
+      link.download = c.name + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }, i * 400);
+  });
+}
+</script>
+</body>
+</html>
